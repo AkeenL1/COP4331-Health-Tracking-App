@@ -16,12 +16,11 @@ export default function Calendar(): JSX.Element {
                     }}
                     hideExtraDays={true}
                     theme={{
-                        agendaKnobColor: '#5838B4',
-                        calendarBackground: 'black',
-                        selectedDayBackgroundColor: "#5838B4",
-                        monthTextColor: 'white',
-                        todayTextColor: '#5838B4',
-                        dayTextColor: 'white'
+                        agendaKnobColor: 'grey',
+                        selectedDayBackgroundColor: "#2596be",
+                        monthTextColor: 'black',
+                        todayTextColor: '#2596be',
+                        dayTextColor: 'black'
                     }}
                 />
                 </CalendarProvider> 
@@ -56,7 +55,7 @@ function DailyData(day): JSX.Element {
     let dateText: string = monthNames[day.substring(5, 7) - 1] + " " + dayText + ", " + day.substring(0, 4)
 
     return (
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, borderTopWidth: 0.5, borderTopColor: 'grey', backgroundColor: 'white'}}>
             <Text style={styles.dateHeading}>
                 {dateText}
             </Text>
@@ -93,7 +92,7 @@ function DailyData(day): JSX.Element {
 }
 const styles = StyleSheet.create({
     dataTitle: {
-        backgroundColor:'#5838B4',
+        backgroundColor:'#2596be',
         flexDirection: 'row'
     },
     titleText: {
@@ -116,7 +115,7 @@ const styles = StyleSheet.create({
         paddingLeft: 55, 
         fontSize: 20, 
         fontWeight: 'bold', 
-        color: '#5838B4', 
+        color: '#2596be', 
         textDecorationLine: 'underline'
     },
     otherText: {
