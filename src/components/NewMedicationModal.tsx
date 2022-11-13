@@ -54,7 +54,7 @@ export default function NewMedicationModal(props): JSX.Element {
                     <Text style={styles.text}>{`Start Date: ${selectedStartDate}`}</Text>
                     <Button 
                         title="Select Start Date"
-                        color='#5838B4'
+                        color='#2596be'
                         onPress={() => setStartDatePickerVisibility(true)}
                     />
                     <DateTimePickerModal
@@ -66,7 +66,7 @@ export default function NewMedicationModal(props): JSX.Element {
                     <Text style={styles.text}>{`End Date: ${selectedEndDate}`}</Text>
                     <Button 
                         title="Select End Date"
-                        color='#5838B4'
+                        color='#2596be'
                         onPress={() => setEndDatePickerVisibility(true)}
                     />
                     <DateTimePickerModal
@@ -82,7 +82,7 @@ export default function NewMedicationModal(props): JSX.Element {
                         <BouncyCheckbox
                             key={index}
                             size={25}
-                            fillColor= '#5838B4'
+                            fillColor= '#2596be'
                             unfillColor="#FFFFFF"
                             text={day}
                             iconStyle={{ borderColor: "white" }}
@@ -99,14 +99,14 @@ export default function NewMedicationModal(props): JSX.Element {
                         <View style={styles.modalActionButton}>            
                             <Button 
                                 title='Cancel'
-                                color='#5838B4'
+                                color='#2596be'
                                 onPress={props.cancelToggle}
                             />
                         </View>
                         <View style={styles.modalActionButton}>              
                             <Button
                                 title='Save'
-                                color='#5838B4'
+                                color='#2596be'
                                 onPress={onSavePress}
                             />
                         </View>
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     medicationName: {
         textAlign: 'center',
         fontSize: 24,
-        color: '#5838B4',
+        color: '#2596be',
         fontWeight: 'bold'
     },
     modalActionButton: {
