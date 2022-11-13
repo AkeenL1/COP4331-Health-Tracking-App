@@ -9,24 +9,39 @@ import Sleep from '../screens/Sleep'
 const Tab = createBottomTabNavigator()
 
 const calendarTabOptions = {
-    tabBarIcon: () => <Image source={require('../../assets/CalendarNavigationIcon.png')} />
+    tabBarIcon: ({focused}) => (
+        focused 
+         ?  <Image style={{height: 25, width: 25}} source={require('../../assets/NavBarIcons/NewSelectedCalendarIcon.png')} />
+         :  <Image style={{height: 25, width: 25}} source={require('../../assets/NavBarIcons/NewCalendarIcon.png')} />
+    )
 }
 const medicationTabOptions = {
-    tabBarIcon: () => <Image source={require('../../assets/PillNavigationIcon.png')} />
+    tabBarIcon: ({focused}) => (
+        focused 
+         ?  <Image style={{height: 25, width: 25}} source={require('../../assets/NavBarIcons/NewSelectedMedsIcon.png')} />
+         :  <Image style={{height: 25, width: 25}} source={require('../../assets/NavBarIcons/NewMedsIcon.png')} />
+    )
 }
 const moodAndEnergyTabOptions = {
-    tabBarIcon: () => <Image source={require('../../assets/MoodNavigationIcon.png')} />
+    tabBarIcon: ({focused}) => (
+        focused 
+         ?  <Image style={{height: 25, width: 25}} source={require('../../assets/NavBarIcons/NewSelectedMoodIcon.png')} />
+         :  <Image style={{height: 25, width: 25}} source={require('../../assets/NavBarIcons/NewMoodIcon.png')} />
+    )
 }
 const sleepTabOptions = {
-    tabBarIcon: () => <Image source={require('../../assets/SleepNavigationIcon.png')} />
+   tabBarIcon: ({focused}) => (
+   focused 
+    ?   <Image style={{height: 25, width: 25}} source={require('../../assets/NavBarIcons/NewSelectedSleepIcon.png')} />
+    :   <Image style={{height: 25, width: 25}} source={require('../../assets/NavBarIcons/NewSleepIcon.png')} />
+   )
 }
 const navBarScreenOptions = {
     headerShown: false,
     tabBarShowLabel: false,
     tabBarHideOnKeyboard: true,
-    tabBarActiveBackgroundColor: '#5838B4',
     tabBarStyle: {
-        backgroundColor: '#000000'
+        backgroundColor: "#FFFFFF"
     }
 }
 
