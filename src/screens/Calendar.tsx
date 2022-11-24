@@ -7,13 +7,48 @@ export default function Calendar(): JSX.Element {
     var date = new Date()
     const initialDate = date.toISOString().substring(0,10)
     const [currentDateSelected,setCurrentDateSelected] = useState(initialDate)
+    const[sleepText,setSleepText] = useState("")
+
+    function getSleepString(parsedData: object) {
+        let sleepString: string = "No Sleep Data"
+    if(parsedData == null) {
+        setSleepText(sleepString)
+        return
+    }
+    switch(parsedData[0]) {
+        case 'btn1' :
+            sleepString = "Amount: <3 Hours"
+            break
+        case 'btn2' :
+            sleepString = "Amount: 3-5 Hours"
+            break
+        case 'btn3' :
+            sleepString = "Amount: 6-7 Hours"
+            break
+        case 'btn4' :
+            sleepString = "Amount: 8-9 Hours"
+            break
+        case 'btn5' :
+            sleepString = "Amount: >9 Hours"
+             break
+        default :
+            setSleepText(sleepString)
+            return
+    }
+    sleepString = sleepString + "\n Quality: " + parsedData[1] + "/10"
+    setSleepText(sleepString)
+    return
+    }
     return (
         <SafeAreaView style={{marginTop: StatusBar.currentHeight}}>
             <SafeAreaView style={{height: '100%'}}>
                 <CalendarProvider date={currentDateSelected}>             
-                <Agenda renderList={() => DailyData(currentDateSelected)}
+                <Agenda renderList={() => DailyData(currentDateSelected, sleepText)}
                     onDayPress={day => {   
                         setCurrentDateSelected(day.dateString)
+                        console.log(currentDateSelected)
+                        //getSleepDataForDate(currentDateSelected).then((data) => getSleepString(data))
+                        //console.log(currentDateSelected + " is selected, Sleep Data is " + sleepText)
                     }}
                     hideExtraDays={true}
                     theme={{
@@ -45,7 +80,8 @@ async function getListOfUserMedications(): Promise<MedicationModel[]> {
     }
 }
 
-async function getSleepDataForDate(date: string): Promise<[]> {
+async function getSleepDataForDate(day: string): Promise<[]> {
+    const date: string =  day.substring(8, 10) + '/' +  day.substring(5, 7) + '/' + day.substring(0, 4)
     try {
         let sleepScreenHash: string = await AsyncStorage.getItem('sleepScreen')
         if (sleepScreenHash != null) {
@@ -73,16 +109,14 @@ async function getMoodAndEnergyDataForDate(date: string): Promise<[]> {
     }
 }
 
-function DailyData(day): JSX.Element {
-
-
+function DailyData(day,sleepText): JSX.Element {
     // NOTE TO BRANDON: 
     // Delete these lines when you do your code! This is just to show you examples of how to access the data you need.
     // Change the date that I passed in to see the data for different days!
 
-    getListOfUserMedications().then((listOfUserMedications) => console.log(listOfUserMedications[0]))
-    getSleepDataForDate('22/11/2022').then((data) => console.log(data))
-    getMoodAndEnergyDataForDate('22/11/2022').then((data) => console.log(data))
+    //getListOfUserMedications().then((listOfUserMedications) => console.log(listOfUserMedications[0]))
+    //getSleepDataForDate('22/11/2022').then((data) => console.log(data))
+    //getMoodAndEnergyDataForDate('22/11/2022').then((data) => console.log(data))
 
 
     const monthNames: string[] = [
@@ -106,21 +140,21 @@ function DailyData(day): JSX.Element {
     } else {
         dayText = day.substring(9, 10)
     }
-
     let dateText: string = monthNames[day.substring(5, 7) - 1] + " " + dayText + ", " + day.substring(0, 4)
-
     return (
         <SafeAreaView style={{flex: 1}}>
             <Text style={styles.dateHeading}>
                 {dateText}
             </Text>
-            <ScrollView>
+            <ScrollView>    
                 <SafeAreaView style={styles.dataTitle}>
                     <Image style={styles.imageFormat} source={require('../../assets/SleepNavigationIcon.png')}/>
                     <Text style={styles.titleText}>{"Sleep"}</Text>
                 </SafeAreaView>
                 <SafeAreaView style={{paddingTop: 10}}>
-                    <Text style={styles.otherText}>{"Amount: 3-4 Hours\nQuality: 4/10"}</Text>
+                 <Text style={styles.otherText}>
+                    {sleepText}
+                 </Text>
                 </SafeAreaView>
                 <SafeAreaView style={styles.dataTitle}>
                     <Image style={styles.imageFormat} source={require('../../assets/PillNavigationIcon.png')}/>
