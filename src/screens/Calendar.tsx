@@ -108,7 +108,7 @@ function DailyData(day): JSX.Element {
     }
 
     let dateText: string = monthNames[day.substring(5, 7) - 1] + " " + dayText + ", " + day.substring(0, 4)
-
+    let todayIs26 = dayText == '26'
     return (
         <SafeAreaView style={{flex: 1}}>
             <Text style={styles.dateHeading}>
@@ -120,26 +120,32 @@ function DailyData(day): JSX.Element {
                     <Text style={styles.titleText}>{"Sleep"}</Text>
                 </SafeAreaView>
                 <SafeAreaView style={{paddingTop: 10}}>
-                    <Text style={styles.otherText}>{"Amount: 3-4 Hours\nQuality: 4/10"}</Text>
+                    {todayIs26 &&
+                        <Text style={styles.otherText}>{"Amount: Over 9 hours\nQuality: 10/10"}</Text>
+                    }
                 </SafeAreaView>
                 <SafeAreaView style={styles.dataTitle}>
                     <Image style={styles.imageFormat} source={require('../../assets/PillNavigationIcon.png')}/>
                     <Text style={styles.titleText}>{"Medications"}</Text>
                 </SafeAreaView>
                 <SafeAreaView style={{paddingTop: 10}}>
-                    <Text style={styles.otherText}>
-                        {"Take Metformin 1 time(s) today\nTake Diazepam 2 times(s) today"}
-                    </Text>
+                    {todayIs26 && 
+                        <Text style={styles.otherText}>
+                            {"Take Advil 1 time(s) today"}
+                        </Text>
+                    }
                 </SafeAreaView>                
                 <SafeAreaView style={styles.dataTitle}>
                     <Image style={styles.imageFormat} source={require('../../assets/MoodNavigationIcon.png')}/>
                     <Text style={styles.titleText}>{"Mood/Energy"}</Text>
                 </SafeAreaView>
                 <SafeAreaView style={{paddingTop: 10}}>
-                    <Text style={styles.timeTitle}>{"04:59:"}</Text>
-                    <Text style={styles.moodText}>{"Mood: Sad\nEnergy: 1/10"}</Text>
-                    <Text style={styles.timeTitle}>{"13:32:"}</Text>
-                    <Text style={styles.moodText}>{"Mood: Happy\nEnergy: 6/10"}</Text>
+                    {todayIs26 &&
+                        <SafeAreaView>
+                            <Text style={styles.timeTitle}>{`${new Date().getHours()}:${new Date().getMinutes()}:`}</Text>
+                            <Text style={styles.moodText}>{"Mood: Great\nEnergy: 10/10"}</Text>
+                        </SafeAreaView>
+                    }
                 </SafeAreaView>
             </ScrollView>
         </SafeAreaView>
