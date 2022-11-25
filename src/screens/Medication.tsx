@@ -32,8 +32,7 @@ export default function Medication(): JSX.Element {
             if (medicationScreenHash != null) {
                 let parsedMedicationScreen: Object = JSON.parse(medicationScreenHash)
                 Object.values(parsedMedicationScreen).forEach((value) => {
-                    let medication: MedicationModel = JSON.parse(value)
-                    tempUserMedications.push(medication)
+                    tempUserMedications.push(value)
                 })
             } else {
                 console.log("The user medication list was updated but the hash was empty.")
@@ -44,6 +43,8 @@ export default function Medication(): JSX.Element {
             setUserMedications(tempUserMedications)
         }
     }
+    
+    updateUserMedications()
 
     const search = () => {
         const currentQuery = text
