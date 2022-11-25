@@ -43,8 +43,6 @@ export default function Medication(): JSX.Element {
             setUserMedications(tempUserMedications)
         }
     }
-    
-    updateUserMedications()
 
     const search = () => {
         const currentQuery = text
