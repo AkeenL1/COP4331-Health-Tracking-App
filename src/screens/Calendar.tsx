@@ -1,54 +1,118 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StatusBar, SafeAreaView, StyleSheet, Text, ScrollView, Image } from 'react-native'
 import { Agenda, CalendarProvider } from 'react-native-calendars'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import moment from 'moment'
 
 export default function Calendar(): JSX.Element {
     var date = new Date()
     const initialDate = date.toISOString().substring(0,10)
-    const [currentDateSelected,setCurrentDateSelected] = useState(initialDate)
-    const[sleepText,setSleepText] = useState("")
+    const [currentDateSelected, setCurrentDateSelected] = useState(initialDate)
+    const[sleepText, setSleepText] = useState("")
+    const[medsText, setMedsText] = useState([])
+
+    useEffect(() => {
+        updateSleepText()
+        updateMedsString()
+    }, [currentDateSelected])
+
+    async function getSleepDataForDate(day: string): Promise<[]> {
+        const date: string =  day.substring(8, 10) + '/' +  day.substring(5, 7) + '/' + day.substring(0, 4)
+        try {
+            let sleepScreenHash: string = await AsyncStorage.getItem('sleepScreen')
+            if (sleepScreenHash != null) {
+                let parsedSleepScreenHash: Object = JSON.parse(sleepScreenHash)
+                return parsedSleepScreenHash[date]
+            } else {
+                console.log("The sleep screen hash is empty.")
+            }
+        } catch (e) {
+            console.log("There was an error getting the sleep screen data: " + e)
+        }
+    }
 
     function getSleepString(parsedData: object) {
         let sleepString: string = "No Sleep Data"
-    if(parsedData == null) {
-        setSleepText(sleepString)
-        return
-    }
-    switch(parsedData[0]) {
-        case 'btn1' :
-            sleepString = "Amount: <3 Hours"
-            break
-        case 'btn2' :
-            sleepString = "Amount: 3-5 Hours"
-            break
-        case 'btn3' :
-            sleepString = "Amount: 6-7 Hours"
-            break
-        case 'btn4' :
-            sleepString = "Amount: 8-9 Hours"
-            break
-        case 'btn5' :
-            sleepString = "Amount: >9 Hours"
-             break
-        default :
+        if(parsedData == null) {
             setSleepText(sleepString)
-            return
+            return sleepString
+        }
+        switch(parsedData[0]) {
+            case 'btn1' :
+                sleepString = "Amount: <3 Hours"
+                break
+            case 'btn2' :
+                sleepString = "Amount: 3-5 Hours"
+                break
+            case 'btn3' :
+                sleepString = "Amount: 6-7 Hours"
+                break
+            case 'btn4' :
+                sleepString = "Amount: 8-9 Hours"
+                break
+            case 'btn5' :
+                sleepString = "Amount: >9 Hours"
+                break
+            default :
+                setSleepText(sleepString)
+                return sleepString
+        }
+        sleepString = sleepString + "\n Quality: " + parsedData[1] + "/10"
+        setSleepText(sleepString)
+        return sleepString
     }
-    sleepString = sleepString + "\n Quality: " + parsedData[1] + "/10"
-    setSleepText(sleepString)
-    return
+
+    function currentWeekdayIsDrugDay(weeklyFrequency: boolean[]): boolean {
+        let selectedDay = Date.parse(currentDateSelected)
+        let day: moment.Moment = moment.unix(selectedDay.valueOf())
+        let weekday = 7 - day.isoWeekday()
+
+        return weeklyFrequency[weekday]
     }
+
+    function selectedDateInRange(med : MedicationModel): boolean {
+        let selectedDate = Date.parse(currentDateSelected)
+        let start = Date.parse(med.dateRange[0])
+        start = start.valueOf() - (start.valueOf() % (86400 * 1000))
+        let end = Date.parse(med.dateRange[1])
+        end = (end - (end % (86400 * 1000))) + (86399 * 1000)
+        
+        return selectedDate.valueOf() >= start && selectedDate.valueOf() <= end.valueOf()
+    }
+
+    function getMedsString(meds : MedicationModel[]) {
+        let validMeds: string[] = []
+
+        for(let i = 0; i < meds.length; i++) {
+            if (selectedDateInRange(meds[i])) {
+                if (currentWeekdayIsDrugDay(meds[i].weeklyFrequency)) {
+                    validMeds.push("Take " + meds[i].dailyDoses.toString() + " " + (meds[i].dailyDoses == 1 ? "dose" : "doses") + " of " + meds[i].name)
+                }
+            }
+        }
+
+        if (validMeds.length == 0) {
+            validMeds.push("No Medications")
+        }
+
+        setMedsText(validMeds)
+    }
+
+    function updateMedsString(): void {
+        getListOfUserMedications().then((listOfUserMedications) => getMedsString(listOfUserMedications))
+    }
+
+    function updateSleepText(): void {
+        getSleepDataForDate(currentDateSelected).then((data) => getSleepString(data))
+    }
+
     return (
         <SafeAreaView style={{marginTop: StatusBar.currentHeight}}>
             <SafeAreaView style={{height: '100%'}}>
                 <CalendarProvider date={currentDateSelected}>             
-                <Agenda renderList={() => DailyData(currentDateSelected, sleepText)}
-                    onDayPress={day => {   
+                <Agenda renderList={() => DailyData(currentDateSelected, sleepText, medsText)}
+                    onDayPress={day => {  
                         setCurrentDateSelected(day.dateString)
-                        console.log(currentDateSelected)
-                        //getSleepDataForDate(currentDateSelected).then((data) => getSleepString(data))
-                        //console.log(currentDateSelected + " is selected, Sleep Data is " + sleepText)
                     }}
                     hideExtraDays={true}
                     theme={{
@@ -66,10 +130,11 @@ export default function Calendar(): JSX.Element {
     )
 }
 
-async function getListOfUserMedications(): Promise<MedicationModel[]> {
+    async function getListOfUserMedications(): Promise<MedicationModel[]> {
     try {
         let medicationScreenHash: string = await AsyncStorage.getItem('medicationScreen')
         if (medicationScreenHash != null) {
+
             let parsedMedicationScreen: Object = JSON.parse(medicationScreenHash)
             return Object.values(parsedMedicationScreen)
         } else {
@@ -77,21 +142,6 @@ async function getListOfUserMedications(): Promise<MedicationModel[]> {
         }
     } catch (e) {
         console.log("There was an error getting the list of user medications: " + e)
-    }
-}
-
-async function getSleepDataForDate(day: string): Promise<[]> {
-    const date: string =  day.substring(8, 10) + '/' +  day.substring(5, 7) + '/' + day.substring(0, 4)
-    try {
-        let sleepScreenHash: string = await AsyncStorage.getItem('sleepScreen')
-        if (sleepScreenHash != null) {
-            let parsedSleepScreenHash: Object = JSON.parse(sleepScreenHash)
-            return parsedSleepScreenHash[date]
-        } else {
-            console.log("The sleep screen hash is empty.")
-        }
-    } catch (e) {
-        console.log("There was an error getting the sleep screen data: " + e)
     }
 }
 
@@ -109,16 +159,8 @@ async function getMoodAndEnergyDataForDate(date: string): Promise<[]> {
     }
 }
 
-function DailyData(day,sleepText): JSX.Element {
-    // NOTE TO BRANDON: 
-    // Delete these lines when you do your code! This is just to show you examples of how to access the data you need.
-    // Change the date that I passed in to see the data for different days!
-
-    //getListOfUserMedications().then((listOfUserMedications) => console.log(listOfUserMedications[0]))
-    //getSleepDataForDate('22/11/2022').then((data) => console.log(data))
+function DailyData(day, sleepText, medsText): JSX.Element {
     //getMoodAndEnergyDataForDate('22/11/2022').then((data) => console.log(data))
-
-
     const monthNames: string[] = [
         "January",
         "February", 
@@ -162,7 +204,7 @@ function DailyData(day,sleepText): JSX.Element {
                 </SafeAreaView>
                 <SafeAreaView style={{paddingTop: 10}}>
                     <Text style={styles.otherText}>
-                        {"Take Metformin 1 time(s) today\nTake Diazepam 2 times(s) today"}
+                        {medsText.map((med) => med + "\n")}
                     </Text>
                 </SafeAreaView>                
                 <SafeAreaView style={styles.dataTitle}>

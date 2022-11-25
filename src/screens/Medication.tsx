@@ -116,15 +116,15 @@ export default function Medication(): JSX.Element {
     const storeMedicationData = async (medication: MedicationModel, id: string) => {
         try {
             let parentHash: string = await AsyncStorage.getItem("medicationScreen")
-            let medicationHash: string = JSON.stringify(medication)
+            
             let parsedParentHash: Object
             if (parentHash == null) {
                 parsedParentHash = {
-                    id: medicationHash
+                    id: medication
                 }
             } else {
                 parsedParentHash = JSON.parse(parentHash)
-                parsedParentHash[id] = medicationHash
+                parsedParentHash[id] = medication
             }
             let newEntry: string = JSON.stringify(parsedParentHash)
             await AsyncStorage.setItem("medicationScreen", newEntry)
