@@ -10,11 +10,43 @@ export default function Calendar(): JSX.Element {
     const [currentDateSelected, setCurrentDateSelected] = useState(initialDate)
     const[sleepText, setSleepText] = useState("")
     const[medsText, setMedsText] = useState([])
+    const[moodText, setMoodText] = useState([])
+    const[moodTimeText, setMoodTimeText] = useState([])
 
     useEffect(() => {
         updateSleepText()
         updateMedsString()
+        updateMoodEnergyText()
     }, [currentDateSelected])
+
+    async function getMoodAndEnergyDataForDate(day: string): Promise<[]> {
+        const date: string =  day.substring(8, 10) + '/' +  day.substring(5, 7) + '/' + day.substring(0, 4)
+        try {
+            let moodAndEnergyScreenHash: string = await AsyncStorage.getItem('moodAndEnergyScreen')
+            if (moodAndEnergyScreenHash != null) {
+                let parsedMoodAndEnergyScreenHash: Object = JSON.parse(moodAndEnergyScreenHash)
+                return parsedMoodAndEnergyScreenHash[date]
+            } else {
+                console.log("The mood and energy screen hash is empty.")
+            }
+        } catch (e) {
+            console.log("There was an error getting the mood and energy screen data: " + e)
+        }
+    }
+
+    async function getListOfUserMedications(): Promise<MedicationModel[]> {
+        try {
+            let medicationScreenHash: string = await AsyncStorage.getItem('medicationScreen')
+            if (medicationScreenHash != null) {
+                let parsedMedicationScreen: Object = JSON.parse(medicationScreenHash)
+                return Object.values(parsedMedicationScreen)
+            } else {
+                console.log("The medications screen hash is empty.")
+            }
+        } catch (e) {
+            console.log("There was an error getting the list of user medications: " + e)
+        }
+    }
 
     async function getSleepDataForDate(day: string): Promise<[]> {
         const date: string =  day.substring(8, 10) + '/' +  day.substring(5, 7) + '/' + day.substring(0, 4)
@@ -82,28 +114,38 @@ export default function Calendar(): JSX.Element {
 
     function getMedsString(meds : MedicationModel[]) {
         let validMeds: string[] = []
-
+        if(meds == null) {
+            validMeds.push("No Medications")
+            setMedsText(validMeds)
+        }
+        console.log(meds.length)
         for(let i = 0; i < meds.length; i++) {
+            console.log(meds[i].name)
             if (selectedDateInRange(meds[i])) {
                 if (currentWeekdayIsDrugDay(meds[i].weeklyFrequency)) {
                     validMeds.push("Take " + meds[i].dailyDoses.toString() + " " + (meds[i].dailyDoses == 1 ? "dose" : "doses") + " of " + meds[i].name)
                 }
             }
         }
-
-        if (validMeds.length == 0) {
-            validMeds.push("No Medications")
-        }
-
         setMedsText(validMeds)
     }
 
+    function getMoodEnergyString(parsedData: Object) {
+        // if parsedData == Null set to default 
+        // Take Object and iterate through pulling out time, mood, and energy for each entry
+            // Assign each time and mood/energy data into seperate string arrays with matching indices
+        // set moodText to mood/energy array and set moodTimeText to time array
+    }
     function updateMedsString(): void {
         getListOfUserMedications().then((listOfUserMedications) => getMedsString(listOfUserMedications))
     }
 
     function updateSleepText(): void {
         getSleepDataForDate(currentDateSelected).then((data) => getSleepString(data))
+    }
+
+    function updateMoodEnergyText(): void {
+        getMoodAndEnergyDataForDate(currentDateSelected).then((data) => getMoodEnergyString(data))
     }
 
     return (
@@ -130,37 +172,7 @@ export default function Calendar(): JSX.Element {
     )
 }
 
-    async function getListOfUserMedications(): Promise<MedicationModel[]> {
-    try {
-        let medicationScreenHash: string = await AsyncStorage.getItem('medicationScreen')
-        if (medicationScreenHash != null) {
-
-            let parsedMedicationScreen: Object = JSON.parse(medicationScreenHash)
-            return Object.values(parsedMedicationScreen)
-        } else {
-            console.log("The medications screen hash is empty.")
-        }
-    } catch (e) {
-        console.log("There was an error getting the list of user medications: " + e)
-    }
-}
-
-async function getMoodAndEnergyDataForDate(date: string): Promise<[]> {
-    try {
-        let moodAndEnergyScreenHash: string = await AsyncStorage.getItem('moodAndEnergyScreen')
-        if (moodAndEnergyScreenHash != null) {
-            let parsedMoodAndEnergyScreenHash: Object = JSON.parse(moodAndEnergyScreenHash)
-            return parsedMoodAndEnergyScreenHash[date]
-        } else {
-            console.log("The mood and energy screen hash is empty.")
-        }
-    } catch (e) {
-        console.log("There was an error getting the mood and energy screen data: " + e)
-    }
-}
-
 function DailyData(day, sleepText, medsText): JSX.Element {
-    //getMoodAndEnergyDataForDate('22/11/2022').then((data) => console.log(data))
     const monthNames: string[] = [
         "January",
         "February", 
@@ -214,9 +226,7 @@ function DailyData(day, sleepText, medsText): JSX.Element {
                 <SafeAreaView style={{paddingTop: 10}}>
                     <Text style={styles.timeTitle}>{"04:59:"}</Text>
                     <Text style={styles.moodText}>{"Mood: Sad\nEnergy: 1/10"}</Text>
-                    <Text style={styles.timeTitle}>{"13:32:"}</Text>
-                    <Text style={styles.moodText}>{"Mood: Happy\nEnergy: 6/10"}</Text>
-                </SafeAreaView>
+                    </SafeAreaView>
             </ScrollView>
         </SafeAreaView>
     )
