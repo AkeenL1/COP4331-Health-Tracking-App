@@ -63,7 +63,7 @@ export default function Sleep(): JSX.Element {
 
                 if (hash == null) {
                     console.log("sleepScreen: Hash empty generating new hash")
-                    let newHash = { date: [data0, data1, ""] }
+                    let newHash = { [date]: [data0, data1, ""] }
                     console.log("sleepScreen: Hash generated saving as " + date + " " + [data0, data1, ""])
                     const entry = JSON.stringify(newHash)
 

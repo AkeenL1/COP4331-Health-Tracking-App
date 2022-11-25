@@ -117,15 +117,19 @@ export default function Calendar(): JSX.Element {
         if(meds == null) {
             validMeds.push("No Medications")
             setMedsText(validMeds)
+            return
         }
-        console.log(meds.length)
         for(let i = 0; i < meds.length; i++) {
-            console.log(meds[i].name)
             if (selectedDateInRange(meds[i])) {
                 if (currentWeekdayIsDrugDay(meds[i].weeklyFrequency)) {
                     validMeds.push("Take " + meds[i].dailyDoses.toString() + " " + (meds[i].dailyDoses == 1 ? "dose" : "doses") + " of " + meds[i].name)
                 }
             }
+        }
+        if(validMeds.length == 0) {
+            validMeds.push("No Medications")
+            setMedsText(validMeds)
+            return
         }
         setMedsText(validMeds)
     }

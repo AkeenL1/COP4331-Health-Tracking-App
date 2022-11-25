@@ -119,7 +119,7 @@ export default function Medication(): JSX.Element {
             let parsedParentHash: Object
             if (parentHash == null) {
                 parsedParentHash = {
-                    id: medication
+                    [id]: medication
                 }
             } else {
                 parsedParentHash = JSON.parse(parentHash)
@@ -160,7 +160,9 @@ export default function Medication(): JSX.Element {
             <View style={{ flex: 9 }}>
                 {!isSearchActive &&
                     <View style={{ flex: 1 }}>
-                        <Text style={{ alignSelf: 'center', fontSize: 30 }}>{"Your Medications"}</Text>
+                        <TouchableOpacity onPress={() => updateUserMedications()}>
+                            <Text style={{ alignSelf: 'center', fontSize: 30 }}>{"Your Medications"}</Text>
+                        </TouchableOpacity>
                         <ScrollView style={{ flex: 5 }}>
                             {userMedications.length == 0 &&
                                 <Text style={{ fontSize: 16, marginLeft: 10, marginTop: 25 }}>{"No Current Medications."}</Text>
