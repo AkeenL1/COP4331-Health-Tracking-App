@@ -42,7 +42,7 @@ export default function Calendar(): JSX.Element {
                 sleepString = "Amount: <3 Hours"
                 break
             case 'btn2' :
-                sleepString = "Amount: 3-5 Hours"
+                sleepString = "Amount: 4-5 Hours"
                 break
             case 'btn3' :
                 sleepString = "Amount: 6-7 Hours"
