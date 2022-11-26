@@ -26,8 +26,6 @@ export default function Calendar(): JSX.Element {
             if (moodAndEnergyScreenHash != null) {
                 let parsedMoodAndEnergyScreenHash: Object = JSON.parse(moodAndEnergyScreenHash)
                 return parsedMoodAndEnergyScreenHash[date]
-            } else {
-                console.log("The mood and energy screen hash is empty.")
             }
         } catch (e) {
             console.log("There was an error getting the mood and energy screen data: " + e)
@@ -40,8 +38,6 @@ export default function Calendar(): JSX.Element {
             if (medicationScreenHash != null) {
                 let parsedMedicationScreen: Object = JSON.parse(medicationScreenHash)
                 return Object.values(parsedMedicationScreen)
-            } else {
-                console.log("The medications screen hash is empty.")
             }
         } catch (e) {
             console.log("There was an error getting the list of user medications: " + e)
@@ -55,8 +51,6 @@ export default function Calendar(): JSX.Element {
             if (sleepScreenHash != null) {
                 let parsedSleepScreenHash: Object = JSON.parse(sleepScreenHash)
                 return parsedSleepScreenHash[date]
-            } else {
-                console.log("The sleep screen hash is empty.")
             }
         } catch (e) {
             console.log("There was an error getting the sleep screen data: " + e)
@@ -97,7 +91,7 @@ export default function Calendar(): JSX.Element {
     function currentWeekdayIsDrugDay(weeklyFrequency: boolean[]): boolean {
         let selectedDay = Date.parse(currentDateSelected)
         let day: moment.Moment = moment.unix(selectedDay.valueOf())
-        let weekday = 7 - day.isoWeekday()
+        let weekday = 6 - day.isoWeekday()
 
         return weeklyFrequency[weekday]
     }
@@ -121,6 +115,7 @@ export default function Calendar(): JSX.Element {
         }
         for(let i = 0; i < meds.length; i++) {
             if (selectedDateInRange(meds[i])) {
+                console.log(meds[i].name + " " + meds[i].weeklyFrequency)
                 if (currentWeekdayIsDrugDay(meds[i].weeklyFrequency)) {
                     validMeds.push("Take " + meds[i].dailyDoses.toString() + " " + (meds[i].dailyDoses == 1 ? "dose" : "doses") + " of " + meds[i].name)
                 }
